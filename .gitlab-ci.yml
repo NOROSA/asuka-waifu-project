@@ -29,17 +29,17 @@ pytest:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
-build-docker:
-  stage: build
-  image: docker:24.0.5
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: overlay2
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"  # solo main
-  before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE:latest .
-    - docker push $CI_REGISTRY_IMAGE:latest
+#build-docker:
+#  stage: build
+#  image: docker:24.0.5
+#  services:
+#    - docker:dind
+#  variables:
+#    DOCKER_DRIVER: overlay2
+#  rules:
+#    - if: $CI_COMMIT_BRANCH == "main"  # solo main
+#  before_script:
+#    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+#  script:
+#    - docker build -t $CI_REGISTRY_IMAGE:latest .
+#    - docker push $CI_REGISTRY_IMAGE:latest
