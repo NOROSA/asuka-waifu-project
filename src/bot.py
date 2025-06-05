@@ -47,6 +47,4 @@ class TsundereBot:
 
     def run(self):
         logger.info("Bot en marcha – esperando mensajes…")
-        # Limpiar webhook antes de empezar polling para evitar conflictos
-        asyncio.run(self.application.bot.delete_webhook(drop_pending_updates=True))
         self.application.run_polling()
