@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings
+from pydantic import Field
 
 class Settings(BaseSettings):
     google_api_key: str = Field(..., env="GOOGLE_API_KEY")
