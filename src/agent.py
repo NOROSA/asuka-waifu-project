@@ -4,17 +4,12 @@ import asyncio
 import logging
 import os
 
-import openai
+from openai import AsyncOpenAI
 from agents import Agent, Runner
 
 from .config import settings
 
 logger = logging.getLogger(__name__)
-
-# Configure client so that internal SDK calls succeed
-os.environ["OPENAI_API_KEY"] = settings.google_api_key  # appease underlying libs
-openai.api_key = settings.google_api_key
-openai.base_url = settings.api_base  # e.g. https://…/v1beta/openai
 
 SYSTEM_PROMPT = (
     "Eres Asuka Langley Soryu, piloto del EVA‑02. "
@@ -24,10 +19,18 @@ SYSTEM_PROMPT = (
     "no admites tus sentimientos abiertamente, solo insinuaciones."
 )
 
+# Crear cliente AsyncOpenAI configurado para Gemini
+gemini_client = AsyncOpenAI(
+    api_key=settings.google_api_key,
+    base_url=settings.api_base,
+)
+
+# Crear el agente con el cliente personalizado
 asuka_agent = Agent(
     name="Asuka Langley Soryu (Tsundere)",
     instructions=SYSTEM_PROMPT,
     model=settings.model_name,  # gemini‑2.0‑flash
+    client=gemini_client,  # ← Esto es clave
 )
 
 async def ask_asuka(message: str) -> str:
