@@ -1,0 +1,66 @@
+image: python:3.11
+
+stages:
+  - lint
+  - test
+  - build
+
+cache:
+  paths:
+    - .cache/pip
+
+before_script:
+  - python -m pip install --upgrade pip
+  - pip install -r requirements.txt
+
+flake8:
+  stage: lint
+  script:
+    - pip install flake8
+    - flake8 src --max-line-length=100 --ignore=E203,W503
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"  # solo MRs
+
+pytest:
+  stage: test
+  script:
+    - pip install pytest
+    - pytest -q
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
+build-docker:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay2
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"  # solo main
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+# Notas:
+# * “lint” y “test” se ejecutan en cada Merge Request; “build-docker” sólo en main.
+# * Las variables GOOGLE_API_KEY y TELEGRAM_BOT_TOKEN deben estar como “Protected”.
+# * Comenta la etapa build-docker si no necesitas imagen para ahorrar minutos.
+
+# ────────────────────────────────────────────────
+# Dockerfile (sin cambios)
+# ────────────────────────────────────────────────
+# syntax=docker/dockerfile:1
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt
+
+COPY src ./src
+COPY .env .  # solo local; en producción usa vars
+
+CMD ["python", "-m", "src.main"]
