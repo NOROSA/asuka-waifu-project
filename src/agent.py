@@ -27,10 +27,9 @@ SYSTEM_PROMPT = (
 asuka_agent = Agent(
     name="Asuka Langley Soryu (Tsundere)",
     instructions=SYSTEM_PROMPT,
-    model=settings.model_name,         # «gemini-2.0-flash»
-    temperature=settings.temperature,
-    max_tokens=settings.max_tokens,
+    model=settings.model_name,
 )
+
 
 # 3· API sin blocking wrapper – usaremos Runner directamente
 async def ask_asuka(message: str) -> str:
