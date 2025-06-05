@@ -43,8 +43,3 @@ build-docker:
   script:
     - docker build -t $CI_REGISTRY_IMAGE:latest .
     - docker push $CI_REGISTRY_IMAGE:latest
-
-# Notas:
-# * “lint” y “test” se ejecutan en cada Merge Request; “build-docker” sólo en main.
-# * Las variables GOOGLE_API_KEY y TELEGRAM_BOT_TOKEN deben estar como “Protected”.
-# * Comenta la etapa build-docker si no necesitas imagen para ahorrar minutos.
