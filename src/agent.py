@@ -5,8 +5,7 @@ import logging
 import os
 
 from openai import AsyncOpenAI
-from agents import Agent, Runner
-from agents.models import OpenAIChatCompletionsModel
+from agents import Agent, Runner, OpenAIChatCompletionsModel
 
 from .config import settings
 
