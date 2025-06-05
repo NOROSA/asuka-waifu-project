@@ -6,7 +6,7 @@ import os
 
 from openai import AsyncOpenAI
 from agents import Agent, Runner
-from agents.models import OpenAIProvider
+from agents.models import OpenAIChatCompletionsModel
 
 from .config import settings
 
@@ -20,26 +20,28 @@ SYSTEM_PROMPT = (
     "no admites tus sentimientos abiertamente, solo insinuaciones."
 )
 
-# Configurar el proveedor de modelo personalizado para Gemini
-model_provider = OpenAIProvider(
-    api_key=settings.google_api_key,
+# Crear cliente AsyncOpenAI configurado para Gemini
+gemini_client = AsyncOpenAI(
     base_url=settings.api_base,
+    api_key=settings.google_api_key,
 )
 
-# Crear el agente
+# Crear el modelo usando OpenAIChatCompletionsModel
+gemini_model = OpenAIChatCompletionsModel(
+    model=settings.model_name,  # gemini-2.0-flash
+    openai_client=gemini_client,
+)
+
+# Crear el agente con el modelo personalizado
 asuka_agent = Agent(
     name="Asuka Langley Soryu (Tsundere)",
     instructions=SYSTEM_PROMPT,
-    model=settings.model_name,  # gemini‑2.0‑flash
+    model=gemini_model,
 )
 
 async def ask_asuka(message: str) -> str:
     """Async helper to query the agent."""
-    result = await Runner.run(
-        asuka_agent, 
-        message,
-        model_provider=model_provider  # Pasar el proveedor aquí
-    )
+    result = await Runner.run(asuka_agent, message)
     return result.final_output
 
 def ask_asuka_sync(message: str) -> str:
