@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     google_api_key: str = Field(..., env="GOOGLE_API_KEY")
     telegram_bot_token: str = Field(..., env="TELEGRAM_BOT_TOKEN")
     api_base: str = Field(
-        "https://generativelanguage.googleapis.com/v1beta", env="API_BASE"
+        "https://generativelanguage.googleapis.com/v1beta/openai", env="API_BASE"
     )
     model_name: str = Field("gemini-2.0-flash", env="MODEL_NAME")
     temperature: float = 0.7
@@ -16,3 +16,4 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
 
 settings = Settings()
+

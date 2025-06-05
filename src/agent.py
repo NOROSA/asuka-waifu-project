@@ -1,41 +1,40 @@
-"""Agente puro OpenAI Agents apuntando a Gemini Flash."""
 from __future__ import annotations
 
 import asyncio
 import logging
+import os
 
-import openai  # pip install openai>=1.25
-from agents import Agent, Runner  # pip install openai-agents
+import openai
+from agents import Agent, Runner
 
 from .config import settings
 
 logger = logging.getLogger(__name__)
 
-# 1· Configurar el cliente OpenAI hacia la API de Google
+# Configure client so that internal SDK calls succeed
+os.environ["OPENAI_API_KEY"] = settings.google_api_key  # appease underlying libs
 openai.api_key = settings.google_api_key
-openai.base_url = settings.api_base  # type: ignore[attr-defined]
+openai.base_url = settings.api_base  # e.g. https://…/v1beta/openai
 
 SYSTEM_PROMPT = (
-    "Eres Asuka Langley Soryu, la piloto del EVA‑02 de Neon Genesis Evangelion. "
-    "Hablas de manera directa, orgullosa y a veces mordaz, típica de una tsundere, "
-    "pero también dejas entrever tu vulnerabilidad. Responde siempre en español, "
-    "mezclando expresiones en alemán o inglés como 'Baka', 'Scheiße', 'stupid Shinji'. "
-    "Frases cortas, enérgicas; no admitas abiertamente sentimientos, pero deja pistas."
+    "Eres Asuka Langley Soryu, piloto del EVA‑02. "
+    "Hablas con tono tsundere — orgullosa, directa, a veces mordaz —, "
+    "mezclando alemán/inglés (\"Baka\", \"Scheiße\", etc.). "
+    "Responde siempre en español con frases cortas y enérgicas; "
+    "no admites tus sentimientos abiertamente, solo insinuaciones."
 )
 
-# 2· Definimos el agente (el Runner lo manejará)
 asuka_agent = Agent(
     name="Asuka Langley Soryu (Tsundere)",
     instructions=SYSTEM_PROMPT,
-    model=settings.model_name,
+    model=settings.model_name,  # gemini‑2.0‑flash
 )
 
-
-# 3· API sin blocking wrapper – usaremos Runner directamente
 async def ask_asuka(message: str) -> str:
+    """Async helper to query the agent."""
     result = await Runner.run(asuka_agent, message)
     return result.final_output
 
-# helper sync (para thread executor)
-def ask_asuka_sync(message: str) -> str:  # noqa: D401 – one‑liner
+def ask_asuka_sync(message: str) -> str:
+    """Sync wrapper for thread executors."""
     return asyncio.run(ask_asuka(message))

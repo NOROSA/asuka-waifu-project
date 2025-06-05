@@ -6,9 +6,9 @@ import logging
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
+    CommandHandler,
     ContextTypes,
     MessageHandler,
-    CommandHandler,
     filters,
 )
 
@@ -36,9 +36,7 @@ class TsundereBot:
         await update.message.reply_text("¿Qué miras, baka? ¡Escribe algo si te atreves!")
 
     async def _cmd_help(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(
-            "Habla conmigo y ya. No necesito manual, ¿vale? ʕ•ᴥ•ʔ"
-        )
+        await update.message.reply_text("Habla conmigo y ya. No necesito manual, ¿vale? ʕ•ᴥ•ʔ")
 
     async def _handle_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_msg = update.message.text
